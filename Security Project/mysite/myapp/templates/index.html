@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+{% static "/" as baseUrl %}
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+
+<body>
+  <div class="main-body">
+    <div class="navbar">
+      <div class="sym nav">Symmetric</div>
+      <div class="asym nav"> Asymmetric</div>
+      <hr>
+    </div>
+    <div class="sym-body">
+      <br><br>
+      <h2>Generate an AES key: </h2>
+      <div>
+        <button id="generate-key" class="generate">Generate</button>
+        <a id="AES_key" href="{% static '/keys/AES_key.key' %}" download>Click to Download Your Key</a>
+      </div>
+      <br><br><br>
+
+      <h2>AES Encryption: </h2>
+      <br>
+      <form id="AES_enc" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h3>Import a key</h3>
+        <br>
+        <input name="key" id="sym-key" type="file" placeholder="Import Key">
+        <button id="close-sym-enc" class="close" type="button">X</button>
+        <br><br>
+
+
+        <h3>Import a file</h3>
+        <br>
+        <input class="file" name="file" id="sym-key" type="file" placeholder="Import Key">
+        <button id="close-sym-enc" class="close" type="button">X</button>
+
+        <br><br>
+        <button type="submit" class="generate">Encrypt</button>
+        <p>Encrypting..</p>
+        <span style="display: none;">{{completed}}</span>
+        <a class="download" href="{{ baseUrl}}{{filename}}.encrypted" download>Click to download</a>
+        <input class='decision' name="decision" type="text" value="AES_enc" style="display: none;">
+        <div class="filename" style="display: none;">{{filename}}</div>
+      </form>
+
+
+      <br><br><br>
+
+      <h2>AES Decryption: </h2>
+      <br>
+      <form id="AES_dec" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h3>Import a key</h3>
+        <br>
+        <input name="key" id="sym-key" type="file" placeholder="Import Key">
+        <button id="close-sym-enc" class="close" type="button">X</button>
+        <br><br>
+
+
+        <h3>Import a file</h3>
+        <br>
+        <input class="file" name="file" id="sym-key" type="file" placeholder="Import Key">
+        <button id="close-sym-enc" class="close" type="button">X</button>
+
+        <br><br>
+        <button type="submit" class="generate">Decrypt</button>
+        <p>Decrypting..</p>
+        <span style="display: none;">{{completed}}</span>
+        <a class="download" href="{{ baseUrl}}{{filename}}" download>Click to download</a>
+        <input class='decision' name="decision" type="text" value="AES_dec" style="display: none;">
+        <div class="filename" style="display: none;">{{filename}}</div>
+      </form>
+
+    </div>
+    <div class="asym-body">
+      <br><br>
+      <h2>Generate an RSA pair of keys: </h2>
+      <div>
+        <button id="generate-rsa" class="generate">Generate</button>
+        <br><br>
+        <div style="display: flex; gap:2.5rem ;">
+          <a class="RSA_keys" href="{% static '/keys/public_key.pem' %}" download>Download Your Public Key</a>
+          <a class="RSA_keys" href="{% static '/keys/private_key.pem' %}" download>Download Your Private
+            Key</a>
+        </div>
+      </div>
+      <br>
+
+      <h2>RSA Encryption: </h2>
+      <br>
+      <form id="RSA_enc" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h3>Import a key</h3>
+        <br>
+        <input name="key" id="sym-key" type="file" placeholder="Import Key">
+        <button id="close-sym-enc" class="close" type="button">X</button>
+        <br><br>
+
+
+        <h3>Import a file</h3>
+        <br>
+        <input class="file" name="file" id="sym-key" type="file" placeholder="Import Key">
+        <button id="close-sym-enc" class="close" type="button">X</button>
+
+        <br><br>
+        <button type="submit" class="generate">Encrypt</button>
+        <p>Encrypting..</p>
+        <span style="display: none;">{{completed}}</span>
+        <a class="download" href="{{ baseUrl}}{{filename}}.encrypted_RSA" download>Click to download</a>
+        <input class='decision' name="decision" type="text" value="RSA_enc" style="display: none;">
+        <div class="filename" style="display: none;">{{filename}}</div>
+      </form>
+
+
+      <br><br><br>
+
+      <h2>RSA Decryption: </h2>
+      <br>
+      <form id="RSA_dec" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h3>Import a key</h3>
+        <br>
+        <input name="key" id="sym-key" type="file" placeholder="Import Key">
+        <button id="close-sym-enc" class="close" type="button">X</button>
+        <br><br>
+
+
+        <h3>Import a file</h3>
+        <br>
+        <input class="file" name="file" id="sym-key" type="file" placeholder="Import Key">
+        <button id="close-sym-enc" class="close" type="button">X</button>
+
+        <br><br>
+        <button type="submit" class="generate">Decrypt</button>
+        <p>Decrypting..</p>
+        <span style="display: none;">{{completed}}</span>
+        <a class="download" href="{{ baseUrl}}decrypted_{{filename}}" download>Click to download</a>
+        <input class='decision' name="decision" type="text" value="RSA_dec" style="display: none;">
+        <div class="filename" style="display: none;">{{filename}}</div>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    // Poll the server for progress updates
+    // function updateProgress() {
+    //   fetch('/main/')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       if (data.completed) {
+    //         document.getElementById('progress').innerHTML = 'Task completed.';
+    //       } else {
+    //         document.getElementById('progress').innerHTML = data.progress;
+    //         setTimeout(updateProgress, 1000);  // Poll every second
+    //       }
+    //     });
+    // }
+    // updateProgress();
+  </script>
+  <script>
+    $(document).ready(function () {
+     
+    });
+
+    // your_script.js
+    $('#generate-key').on('click', function () {
+
+      $.ajax({
+        url: '/generate_AES/',
+        type: 'GET',
+        success: function (data) {
+          if (data.result) {
+            $('#AES_key').css('display', 'inline')
+          }
+
+        }
+      });
+    })
+
+    $('#generate-rsa').on('click', function () {
+
+      $.ajax({
+        url: '/generate_RSA/',
+        type: 'GET',
+        success: function (data) {
+          if (data.result) {
+            $('.RSA_keys').css('display', 'inline')
+          }
+
+        }
+      });
+    })
+
+    $(".sym").on('click', function () {
+      $(".sym").css({ 'color': 'rgb(19, 105, 233)', 'border-bottom': '1px solid rgb(19, 105, 233)' })
+      $(".sym-body").css('display', 'inline')
+
+      $(".asym").css({ 'color': 'black', 'border-bottom': 'none' })
+      $(".asym-body").css('display', 'none')
+    })
+
+    $(".asym").on('click', function () {
+      $(".asym").css({ 'color': 'rgb(19, 105, 233)', 'border-bottom': '1px solid rgb(19, 105, 233)' })
+      $(".asym-body").css('display', 'inline')
+
+      $(".sym").css({ 'color': 'black', 'border-bottom': 'none' })
+      $(".sym-body").css('display', 'none')
+    })
+
+    $('#sym-key').on('change', function () {
+      $('#close-sym-enc').css('display', 'inline')
+    })
+
+    $('#close-sym-enc').on('click', function () {
+      $('#sym-key').val("")
+      $('#sym-key').change()
+      $('#close-sym-enc').css('display', 'none')
+    })
+
+    $('#AES_enc').on('submit', function () {
+      $('#AES_enc p').css('display', 'inline')
+    })
+    if ($('#AES_enc span').text() == $('#AES_enc .decision').val()) { $('#AES_enc .download').css('display', 'inline') }
+
+
+    $('#AES_dec').on('submit', function () {
+      $('#AES_dec p').css('display', 'inline')
+    })
+    if ($('#AES_dec span').text() == $('#AES_dec .decision').val()) { $('#AES_dec .download').css('display', 'inline') }
+
+    // ---------------------------------------------
+
+    $('#RSA_enc').on('submit', function () {
+      $('#RSA_enc p').css('display', 'inline')
+    })
+    if ($('#RSA_enc span').text() == $('#RSA_enc .decision').val()) { $('#RSA_enc .download').css('display', 'inline') }
+
+
+    $('#RSA_dec').on('submit', function () {
+      $('#RSA_dec p').css('display', 'inline')
+    })
+    if ($('#RSA_dec span').text() == $('#RSA_dec .decision').val()) { $('#RSA_dec .download').css('display', 'inline') }
+
+
+    ///-------------------------------------
+    if ($('#RSA_enc span').text() == "RSA_enc" || $('#RSA_enc span').text() == "RSA_dec"){
+      $('.asym').click()
+    }
+
+  </script>
+</body>
+
+</html>
